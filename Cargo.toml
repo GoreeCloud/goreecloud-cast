@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 rust-version = "1.85"
 description = "Development core contracts for GoreeCloud Cast"
-license = "MIT"
+publish = false
 
 [lib]
 name = "goreecloud_cast_core"
