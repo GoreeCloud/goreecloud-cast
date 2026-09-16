@@ -48,7 +48,7 @@ impl CredentialLease {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Clone, Default)]
 pub struct InMemoryCredentialLeaseStore {
     leases: HashMap<String, CredentialLease>,
 }
