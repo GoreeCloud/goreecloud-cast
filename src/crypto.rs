@@ -181,7 +181,8 @@ fn frame_message(
     transport_sequence: u64,
     frame_bytes: &[u8],
 ) -> Result<Vec<u8>, AdapterError> {
-    let frame_len = u32::try_from(frame_bytes.len()).map_err(|_| AdapterError::InvalidFrameProof)?;
+    let frame_len =
+        u32::try_from(frame_bytes.len()).map_err(|_| AdapterError::InvalidFrameProof)?;
     let mut message = Vec::with_capacity(
         FRAME_DOMAIN.len()
             + sender.as_str().len()
