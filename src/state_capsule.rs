@@ -43,14 +43,21 @@ impl StateCapsule {
     pub fn push(&mut self, entry: StateEntry) -> Result<(), CapsuleError> {
         if entry.key.is_empty()
             || entry.key.len() > 96
-            || self.entries.iter().any(|existing| existing.key == entry.key)
+            || self
+                .entries
+                .iter()
+                .any(|existing| existing.key == entry.key)
         {
             return Err(CapsuleError::InvalidOrDuplicateKey);
         }
         if self.entries.len() >= MAX_STATE_ENTRIES {
             return Err(CapsuleError::TooManyEntries);
         }
-        let current = self.entries.iter().map(|entry| entry.value.len()).sum::<usize>();
+        let current = self
+            .entries
+            .iter()
+            .map(|entry| entry.value.len())
+            .sum::<usize>();
         if current.saturating_add(entry.value.len()) > MAX_STATE_BYTES {
             return Err(CapsuleError::PayloadTooLarge);
         }
