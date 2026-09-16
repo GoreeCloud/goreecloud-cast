@@ -18,9 +18,7 @@ impl CommandEnvelope {
         payload: Vec<u8>,
     ) -> Result<Self, CommandError> {
         let session_id = session_id.into();
-        if !(16..=128).contains(&session_id.len())
-            || session_id.chars().any(char::is_control)
-        {
+        if !(16..=128).contains(&session_id.len()) || session_id.chars().any(char::is_control) {
             return Err(CommandError::InvalidSessionId);
         }
         if sequence == 0 {
@@ -73,9 +71,7 @@ pub struct CommandSequencer {
 impl CommandSequencer {
     pub fn new(session_id: impl Into<String>) -> Result<Self, CommandError> {
         let session_id = session_id.into();
-        if !(16..=128).contains(&session_id.len())
-            || session_id.chars().any(char::is_control)
-        {
+        if !(16..=128).contains(&session_id.len()) || session_id.chars().any(char::is_control) {
             return Err(CommandError::InvalidSessionId);
         }
         Ok(Self {

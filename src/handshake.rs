@@ -9,9 +9,9 @@ use crate::{
     discovery::AuthenticatedDiscoveryDetails,
     identity::DeviceId,
     protocol::{
+        MessageKind, ProtocolError, ProtocolFrame, SessionOpenPayload,
         decode_authenticated_discovery_details, decode_session_open,
-        encode_authenticated_discovery_details, encode_session_open, MessageKind, ProtocolError,
-        ProtocolFrame, SessionOpenPayload,
+        encode_authenticated_discovery_details, encode_session_open,
     },
     session::{SessionDescriptor, SessionError, SessionState, StateAuthority},
 };
@@ -34,9 +34,7 @@ impl HandshakeRequest {
         challenge_nonce: [u8; 32],
     ) -> Result<Self, HandshakeError> {
         let session_id = session_id.into();
-        if !(16..=128).contains(&session_id.len())
-            || session_id.chars().any(char::is_control)
-        {
+        if !(16..=128).contains(&session_id.len()) || session_id.chars().any(char::is_control) {
             return Err(HandshakeError::InvalidRequest);
         }
         let rotating_discovery_id = rotating_discovery_id.into();

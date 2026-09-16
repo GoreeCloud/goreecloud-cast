@@ -1,7 +1,4 @@
-use crate::{
-    identity::DeviceId,
-    PROTOCOL_MAJOR, PROTOCOL_MINOR,
-};
+use crate::{PROTOCOL_MAJOR, PROTOCOL_MINOR, identity::DeviceId};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceCategory {

@@ -9,8 +9,8 @@ use goreecloud_cast_core::{
     handshake::{HandshakeError, HandshakeRequest, InMemoryHandshakeHarness},
     identity::{DeviceId, TrustLevel},
     protocol::{
-        decode_authenticated_discovery_details, encode_authenticated_discovery_details, MessageKind,
-        ProtocolFrame,
+        MessageKind, ProtocolFrame, decode_authenticated_discovery_details,
+        encode_authenticated_discovery_details,
     },
     session::SessionState,
 };
@@ -73,10 +73,7 @@ impl PairingAuthorizer for TestPairing {
 struct TestCredentials;
 
 impl SessionCredentialAuthority for TestCredentials {
-    fn issue(
-        &self,
-        binding: &SessionCredentialBinding,
-    ) -> Result<SessionCredential, AdapterError> {
+    fn issue(&self, binding: &SessionCredentialBinding) -> Result<SessionCredential, AdapterError> {
         SessionCredential::new("session-credential-0001", binding.clone())
     }
 
@@ -125,23 +122,30 @@ fn in_memory_handshake_reaches_active_only_after_identity_pairing_and_credential
     let identity = TestIdentity;
     let pairing = TestPairing;
     let credentials = TestCredentials;
-    let harness = InMemoryHandshakeHarness::new(
-        &identity,
-        &identity,
-        &pairing,
-        &credentials,
-    );
+    let harness = InMemoryHandshakeHarness::new(&identity, &identity, &pairing, &credentials);
 
     let outcome = harness
         .establish(&handshake_request(), &receiver_details())
         .unwrap();
 
     assert_eq!(outcome.session.state, SessionState::Active);
-    assert_eq!(outcome.pairing_grant.trust_level, TrustLevel::ApprovedDevice);
-    assert_eq!(outcome.receiver_details.friendly_name, "Living Room Display");
+    assert_eq!(
+        outcome.pairing_grant.trust_level,
+        TrustLevel::ApprovedDevice
+    );
+    assert_eq!(
+        outcome.receiver_details.friendly_name,
+        "Living Room Display"
+    );
     assert_eq!(outcome.transcript.len(), 4);
-    assert_eq!(outcome.transcript[0].kind, MessageKind::DiscoveryDetailsRequest);
-    assert_eq!(outcome.transcript[1].kind, MessageKind::DiscoveryDetailsResponse);
+    assert_eq!(
+        outcome.transcript[0].kind,
+        MessageKind::DiscoveryDetailsRequest
+    );
+    assert_eq!(
+        outcome.transcript[1].kind,
+        MessageKind::DiscoveryDetailsResponse
+    );
     assert_eq!(outcome.transcript[2].kind, MessageKind::SessionOpen);
     assert_eq!(outcome.transcript[3].kind, MessageKind::SessionAccepted);
 }
@@ -152,12 +156,7 @@ fn authenticated_discovery_details_are_not_released_when_identity_verification_f
     let verifier = RejectingVerifier;
     let pairing = TestPairing;
     let credentials = TestCredentials;
-    let harness = InMemoryHandshakeHarness::new(
-        &identity,
-        &verifier,
-        &pairing,
-        &credentials,
-    );
+    let harness = InMemoryHandshakeHarness::new(&identity, &verifier, &pairing, &credentials);
 
     assert_eq!(
         harness.establish(&handshake_request(), &receiver_details()),

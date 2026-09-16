@@ -16,10 +16,7 @@ impl AuthenticationChallenge {
         context: impl Into<String>,
     ) -> Result<Self, AdapterError> {
         let context = context.into();
-        if context.is_empty()
-            || context.len() > 96
-            || context.chars().any(char::is_control)
-        {
+        if context.is_empty() || context.len() > 96 || context.chars().any(char::is_control) {
             return Err(AdapterError::InvalidChallenge);
         }
         Ok(Self { nonce, context })
@@ -79,9 +76,7 @@ impl PairingGrant {
         trust_level: TrustLevel,
     ) -> Result<Self, AdapterError> {
         let grant_id = grant_id.into();
-        if !(16..=192).contains(&grant_id.len())
-            || grant_id.chars().any(char::is_control)
-        {
+        if !(16..=192).contains(&grant_id.len()) || grant_id.chars().any(char::is_control) {
             return Err(AdapterError::InvalidPairingGrant);
         }
         Ok(Self {
@@ -111,9 +106,7 @@ impl SessionCredentialBinding {
         receiver: DeviceId,
     ) -> Result<Self, AdapterError> {
         let session_id = session_id.into();
-        if !(16..=128).contains(&session_id.len())
-            || session_id.chars().any(char::is_control)
-        {
+        if !(16..=128).contains(&session_id.len()) || session_id.chars().any(char::is_control) {
             return Err(AdapterError::InvalidCredentialBinding);
         }
         Ok(Self {
@@ -144,10 +137,7 @@ impl SessionCredential {
 }
 
 pub trait SessionCredentialAuthority: fmt::Debug {
-    fn issue(
-        &self,
-        binding: &SessionCredentialBinding,
-    ) -> Result<SessionCredential, AdapterError>;
+    fn issue(&self, binding: &SessionCredentialBinding) -> Result<SessionCredential, AdapterError>;
 
     fn validate(&self, credential: &SessionCredential) -> Result<bool, AdapterError>;
 

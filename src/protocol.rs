@@ -1,10 +1,10 @@
 use core::fmt;
 
 use crate::{
+    PROTOCOL_MAJOR, PROTOCOL_MINOR,
     auth::{SessionCredential, SessionCredentialBinding},
     discovery::{AuthenticatedDiscoveryDetails, DeviceCategory},
     identity::DeviceId,
-    PROTOCOL_MAJOR, PROTOCOL_MINOR,
 };
 
 const MAGIC: &[u8; 4] = b"GCC0";
@@ -142,8 +142,8 @@ pub fn decode_authenticated_discovery_details(
 ) -> Result<AuthenticatedDiscoveryDetails, ProtocolError> {
     let mut cursor = Cursor::new(bytes);
     let rotating_discovery_id = cursor.take_string()?;
-    let device_id = DeviceId::parse(cursor.take_string()?)
-        .map_err(|_| ProtocolError::InvalidField)?;
+    let device_id =
+        DeviceId::parse(cursor.take_string()?).map_err(|_| ProtocolError::InvalidField)?;
     let friendly_name = cursor.take_string()?;
     let category = category_from_wire(cursor.take_u8()?)?;
     let capability_digest = cursor.take_u64()?;
@@ -177,10 +177,10 @@ pub fn encode_session_open(payload: &SessionOpenPayload) -> Result<Vec<u8>, Prot
 pub fn decode_session_open(bytes: &[u8]) -> Result<SessionOpenPayload, ProtocolError> {
     let mut cursor = Cursor::new(bytes);
     let session_id = cursor.take_string()?;
-    let controller = DeviceId::parse(cursor.take_string()?)
-        .map_err(|_| ProtocolError::InvalidField)?;
-    let receiver = DeviceId::parse(cursor.take_string()?)
-        .map_err(|_| ProtocolError::InvalidField)?;
+    let controller =
+        DeviceId::parse(cursor.take_string()?).map_err(|_| ProtocolError::InvalidField)?;
+    let receiver =
+        DeviceId::parse(cursor.take_string()?).map_err(|_| ProtocolError::InvalidField)?;
     let credential_handle = cursor.take_string()?;
     cursor.finish()?;
 
