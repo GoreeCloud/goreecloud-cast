@@ -43,7 +43,9 @@ impl<'a> ControllerEndpoint<'a> {
         credential: &SessionCredential,
         correlation_id: u64,
     ) -> Result<(), EndpointError> {
-        if credential.binding.controller != self.device_id || credential.binding.receiver != *receiver {
+        if credential.binding.controller != self.device_id
+            || credential.binding.receiver != *receiver
+        {
             return Err(EndpointError::BindingMismatch);
         }
         let payload = encode_session_open(&SessionOpenPayload::from_credential(credential))?;
@@ -64,8 +66,8 @@ impl<'a> ControllerEndpoint<'a> {
         if opened.frame.kind != MessageKind::SessionAccepted {
             return Err(EndpointError::UnexpectedMessage);
         }
-        let session_id = String::from_utf8(opened.frame.payload)
-            .map_err(|_| EndpointError::ProtocolFailure)?;
+        let session_id =
+            String::from_utf8(opened.frame.payload).map_err(|_| EndpointError::ProtocolFailure)?;
         if !(16..=128).contains(&session_id.len()) || session_id.chars().any(char::is_control) {
             return Err(EndpointError::ProtocolFailure);
         }
@@ -115,7 +117,8 @@ impl<'a> ReceiverEndpoint<'a> {
         }
 
         let payload = decode_session_open(&opened.frame.payload)?;
-        if payload.binding.controller != opened.sender || payload.binding.receiver != self.device_id {
+        if payload.binding.controller != opened.sender || payload.binding.receiver != self.device_id
+        {
             return Err(EndpointError::BindingMismatch);
         }
         let trust = self
@@ -126,10 +129,8 @@ impl<'a> ReceiverEndpoint<'a> {
             return Err(EndpointError::UntrustedController);
         }
 
-        let credential = SessionCredential::new(
-            payload.credential_handle,
-            payload.binding.clone(),
-        )?;
+        let credential =
+            SessionCredential::new(payload.credential_handle, payload.binding.clone())?;
         if self.credentials.validate(&credential, now_ms) != CredentialLeaseStatus::Valid {
             return Err(EndpointError::CredentialRejected);
         }
