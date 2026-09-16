@@ -54,6 +54,27 @@ pub trait DeviceIdentityVerifier: fmt::Debug {
     ) -> Result<bool, AdapterError>;
 }
 
+pub trait FrameSigner: fmt::Debug {
+    fn sign_frame(
+        &self,
+        sender: &DeviceId,
+        receiver: &DeviceId,
+        transport_sequence: u64,
+        frame_bytes: &[u8],
+    ) -> Result<Vec<u8>, AdapterError>;
+}
+
+pub trait FrameVerifier: fmt::Debug {
+    fn verify_frame(
+        &self,
+        sender: &DeviceId,
+        receiver: &DeviceId,
+        transport_sequence: u64,
+        frame_bytes: &[u8],
+        signature: &[u8],
+    ) -> Result<bool, AdapterError>;
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PairingRequest {
     pub controller: DeviceId,
@@ -148,6 +169,7 @@ pub trait SessionCredentialAuthority: fmt::Debug {
 pub enum AdapterError {
     InvalidChallenge,
     InvalidIdentityProof,
+    InvalidFrameProof,
     InvalidPairingGrant,
     InvalidCredentialBinding,
     InvalidSessionCredential,
