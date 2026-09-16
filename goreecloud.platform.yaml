@@ -7,7 +7,7 @@ component:
   repository: GoreeCloud/goreecloud-cast
 
 lifecycle: development
-version: '0.2.0'
+version: '0.3.0'
 
 supported_platforms: []
 
@@ -30,21 +30,24 @@ platform_systems:
       - src/state_capsule.rs
       - src/handoff.rs
       - PRIVACY POLICY.md
-    notes: The Phase 0 core consumes a bounded privacy decision and filters State Capsule entries, but no authenticated Privacy Shield adapter, durable authorization, revocation, or runtime acceptance exists.
+    notes: The Phase 0 core consumes a bounded privacy decision and filters State Capsule entries. Device authentication does not replace Privacy Shield authorization; no authenticated Privacy Shield adapter, durable authorization, revocation, or runtime acceptance exists.
   wardveil_security:
     result: applicable-blocked
     version: null
     evidence:
       - src/handoff.rs
+      - src/crypto.rs
       - SECURITY.md
-    notes: The Phase 0 core fails closed on denied or unknown security decisions and now includes source-level handshake/command boundaries, but no authenticated Wardveil runtime integration, posture evaluation, threat monitoring, or production security acceptance exists.
+      - THIRD-PARTY-NOTICES.md
+    notes: The core fails closed on denied or unknown security decisions and now provides a Development Ed25519 device-challenge provider plus source-level pairing and credential-lease controls, but no authenticated Wardveil runtime integration, posture evaluation, threat monitoring, target key-lifecycle acceptance, or production security acceptance exists.
   everkeep:
     result: applicable-blocked
     version: null
     evidence:
       - FEATURE-ROADMAP.md
       - SPECIFICATIONS.md
-    notes: Session continuity and recoverable configuration are planned, but no accepted Everkeep backup, restore, migration, or recovery integration exists.
+      - src/credentials.rs
+    notes: Credential leases are currently in-memory Development state. Session continuity and recoverable configuration are planned, but no accepted persistent trust store, Everkeep backup, restore, migration, revocation-safe recovery, or recovery integration exists.
   glaze_ui:
     result: applicable-migration-required
     version: null
@@ -69,10 +72,15 @@ platform_systems:
     evidence:
       - src/identity.rs
       - src/auth.rs
+      - src/crypto.rs
+      - src/pairing.rs
+      - src/credentials.rs
       - src/handshake.rs
       - SECURITY.md
+      - THIRD-PARTY-NOTICES.md
       - tests/phase0_handshake.rs
-    notes: The core now defines bounded identity/trust types plus device-identity signer/verifier, pairing-authorizer, and session-credential authority interfaces, and the in-memory harness fails closed when identity verification is rejected. No production cryptographic provider, live GoreeCloud Identity adapter, credential issuance service, trust persistence, revocation, or runtime acceptance exists.
+      - tests/security_contracts.rs
+    notes: The core now includes bounded identity/trust types, device-identity signer/verifier contracts, a concrete Development Ed25519 challenge provider, pairing confirmation semantics, and session-credential lease semantics. No approved production key generation/storage/rotation/recovery, live GoreeCloud Identity adapter, persistent trust service, revocation distribution, or runtime acceptance exists.
 
 health:
   health_endpoint: null
@@ -83,21 +91,25 @@ continuity:
     required: true
     requirements:
       - Preserve only approved durable Cast trust, policy, group, and recovery state through accepted Everkeep-aligned backup scope when those stores are implemented.
-      - Exclude transient session secrets and unrelated user content from ordinary backup payloads.
+      - Exclude transient session secrets and private device signing keys from ordinary Cast backup payloads unless a separately approved key-recovery architecture explicitly authorizes them.
   restore:
     required: true
     requirements:
-      - Validate clean restoration of approved durable Cast state without reviving revoked trust or expired credentials before production dependence.
+      - Validate clean restoration of approved durable Cast state without reviving revoked trust, expired credentials, or superseded key material before production dependence.
   export:
     required: true
     requirements:
-      - Provide documented export for user-owned Cast configuration and trusted-device metadata where policy permits, excluding secrets and security evidence.
+      - Provide documented export for user-owned Cast configuration and trusted-device metadata where policy permits, excluding private keys, session secrets, and security evidence.
   portability:
     required: true
     requirements:
-      - Keep Cast session, capability, receiver, protocol, and portable configuration contracts independently documented and versioned.
+      - Keep Cast session, capability, receiver, protocol, cryptographic-provider, and portable configuration contracts independently documented and versioned.
 
-external_dependencies: []
+external_dependencies:
+  - name: ed25519-dalek
+    purpose: Ed25519 device-identity challenge signing and strict verification behind GoreeCloud Cast identity-provider traits.
+    required: true
+    version_constraint: '=3.0.0'
 
 compatibility:
   platform_contract: '0.2'
@@ -105,6 +117,7 @@ compatibility:
   requires:
     - goreecloud-platform-contract==0.2
     - glaze-ui==1.5.0
+    - ed25519-dalek==3.0.0
   provides:
     - cast-core-phase0
     - cast-handoff-preflight-development
@@ -112,6 +125,9 @@ compatibility:
     - cast-protocol-0.2-development
     - cast-command-sequencing-development
     - cast-in-memory-handshake-development
+    - cast-ed25519-device-identity-development
+    - cast-pairing-confirmation-development
+    - cast-credential-lease-development
 
 evidence:
   acceptance_tests:
@@ -129,6 +145,13 @@ evidence:
       result: passed
       observed_at: '2026-09-16T22:19:33Z'
       notes: GoreeCloud Cast Core CI run 35157077714 passed cargo fmt --check and cargo test --all-targets for identity/pairing/session-credential adapter contracts, deterministic protocol serialization, authenticated discovery-detail gating, command ordering/idempotency, and the in-memory handshake harness.
+    - id: cast-phase0-ed25519-pairing-credentials-20260916
+      category: security
+      path: tests/security_contracts.rs
+      revision: 2bab9042542937efbf96fa9539031a3ba1c4ded9
+      result: passed
+      observed_at: '2026-09-16T22:36:00Z'
+      notes: GoreeCloud Cast Core CI run 35158442444 passed cargo fmt --check and cargo test --all-targets for the pinned Ed25519 device-challenge provider, strict verification, pairing confirmation state machine, and expiring/revocable credential-lease contracts.
   release: []
 
 conformance:
@@ -139,22 +162,28 @@ conformance:
     - SPECIFICATIONS.md
     - SECURITY.md
     - PRIVACY POLICY.md
+    - THIRD-PARTY-NOTICES.md
     - docs/architecture/phase-0-core.md
     - src/auth.rs
     - src/command.rs
+    - src/credentials.rs
+    - src/crypto.rs
     - src/discovery.rs
     - src/handoff.rs
     - src/handshake.rs
+    - src/pairing.rs
     - src/protocol.rs
     - src/state_capsule.rs
     - tests/core_contracts.rs
     - tests/phase0_handshake.rs
+    - tests/security_contracts.rs
   blockers:
-    - Exact-source Development CI passes for the bounded Phase 0 core and in-memory handshake/protocol increment, but this does not establish runtime, platform-integration, production, release, or Stable acceptance.
-    - Identity/pairing/session-credential interfaces now exist, but no production cryptographic device identity provider, secure pairing implementation, expiring/revocable session credential provider, encryption, authenticated network transport, or durable trust store exists.
+    - Exact-source Development CI passes for the bounded core, in-memory handshake/protocol increment, and Development Ed25519/pairing/credential-lease increment, but this does not establish runtime, platform-integration, production, release, or Stable acceptance.
+    - A concrete Development Ed25519 challenge provider exists, but approved production device-key generation, secure storage, hardware-backed protection where applicable, rotation, recovery, revocation distribution, and target-platform isolation are not established.
+    - Pairing confirmation and credential leases are deterministic in-memory Development components; complete pairing UX/runtime, persistent trust, durable revocation, authenticated network transport, and recovery-safe authorization remain unimplemented.
     - Source-level command ordering and idempotency exist, but complete replay protection across real transports, reconnect, recovery, and malicious peers is not established.
     - Manager, Privacy Shield, Wardveil Security, Everkeep, Mesh, and Identity runtime integrations remain unaccepted.
     - Glaze UI 1.5.0 is the current required Stable consumer target, but no Cast UI implementation or product-specific acceptance evidence exists.
-    - No controller or receiver runtime, network transport, media playback, streaming, capture, grouping, guest, or remote Cast implementation exists.
+    - No controller or receiver runtime, authenticated network transport, media playback, streaming, capture, grouping, guest, or remote Cast implementation exists.
     - No health/readiness endpoints, deployment, production acceptance, release evidence, or Stable qualification exists.
     - GoreeCloud Sync remains separately governed; no Cast synchronization integration is accepted or required for basic local operation.
