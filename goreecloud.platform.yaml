@@ -7,7 +7,7 @@ component:
   repository: GoreeCloud/goreecloud-cast
 
 lifecycle: development
-version: '0.1.0'
+version: '0.2.0'
 
 supported_platforms: []
 
@@ -37,7 +37,7 @@ platform_systems:
     evidence:
       - src/handoff.rs
       - SECURITY.md
-    notes: The Phase 0 core fails closed on denied or unknown security decisions, but no authenticated Wardveil runtime integration, posture evaluation, threat monitoring, or production security acceptance exists.
+    notes: The Phase 0 core fails closed on denied or unknown security decisions and now includes source-level handshake/command boundaries, but no authenticated Wardveil runtime integration, posture evaluation, threat monitoring, or production security acceptance exists.
   everkeep:
     result: applicable-blocked
     version: null
@@ -58,7 +58,7 @@ platform_systems:
     evidence:
       - FEATURE-ROADMAP.md
       - SPECIFICATIONS.md
-    notes: Mesh capability discovery and ecosystem coordination are applicable, but no registration, discovery, event, dependency, or runtime integration exists.
+    notes: Mesh capability discovery and ecosystem coordination are applicable, but no registration, discovery, event, dependency, or runtime integration exists. The local deterministic protocol and discovery models do not establish Mesh conformance.
     capabilities: []
     dependencies: []
     published_events: []
@@ -68,9 +68,11 @@ platform_systems:
     version: null
     evidence:
       - src/identity.rs
-      - src/handoff.rs
+      - src/auth.rs
+      - src/handshake.rs
       - SECURITY.md
-    notes: The core defines bounded identity/trust types and consumes an Identity gate decision, but no cryptographic device identity, authenticated Identity adapter, credential issuance, trust persistence, revocation, or runtime acceptance exists.
+      - tests/phase0_handshake.rs
+    notes: The core now defines bounded identity/trust types plus device-identity signer/verifier, pairing-authorizer, and session-credential authority interfaces, and the in-memory harness fails closed when identity verification is rejected. No production cryptographic provider, live GoreeCloud Identity adapter, credential issuance service, trust persistence, revocation, or runtime acceptance exists.
 
 health:
   health_endpoint: null
@@ -93,7 +95,7 @@ continuity:
   portability:
     required: true
     requirements:
-      - Keep Cast session, capability, receiver, and portable configuration contracts independently documented and versioned.
+      - Keep Cast session, capability, receiver, protocol, and portable configuration contracts independently documented and versioned.
 
 external_dependencies: []
 
@@ -106,6 +108,10 @@ compatibility:
   provides:
     - cast-core-phase0
     - cast-handoff-preflight-development
+    - cast-auth-adapter-contracts-development
+    - cast-protocol-0.2-development
+    - cast-command-sequencing-development
+    - cast-in-memory-handshake-development
 
 evidence:
   acceptance_tests:
@@ -115,7 +121,14 @@ evidence:
       revision: f165832a3e2e0be546415672a916f706e21890b8
       result: passed
       observed_at: '2026-09-16T22:05:17Z'
-      notes: GoreeCloud Cast Core CI run 35155854625 passed cargo fmt --check and cargo test --all-targets for the bounded Phase 0 core on the exact source revision.
+      notes: GoreeCloud Cast Core CI run 35155854625 passed cargo fmt --check and cargo test --all-targets for the initial bounded Phase 0 core on the exact source revision.
+    - id: cast-phase0-handshake-protocol-20260916
+      category: core
+      path: tests/phase0_handshake.rs
+      revision: c421ce127059a0a1cd8ba33740e9c2188bbf58a3
+      result: passed
+      observed_at: '2026-09-16T22:19:33Z'
+      notes: GoreeCloud Cast Core CI run 35157077714 passed cargo fmt --check and cargo test --all-targets for identity/pairing/session-credential adapter contracts, deterministic protocol serialization, authenticated discovery-detail gating, command ordering/idempotency, and the in-memory handshake harness.
   release: []
 
 conformance:
@@ -127,12 +140,19 @@ conformance:
     - SECURITY.md
     - PRIVACY POLICY.md
     - docs/architecture/phase-0-core.md
+    - src/auth.rs
+    - src/command.rs
+    - src/discovery.rs
     - src/handoff.rs
+    - src/handshake.rs
+    - src/protocol.rs
     - src/state_capsule.rs
     - tests/core_contracts.rs
+    - tests/phase0_handshake.rs
   blockers:
-    - Exact-source Development CI passes for the bounded Phase 0 core, but this does not establish runtime, platform-integration, production, release, or Stable acceptance.
-    - No cryptographic device identity, secure pairing, session credential derivation, encryption, replay protection, or durable trust store exists.
+    - Exact-source Development CI passes for the bounded Phase 0 core and in-memory handshake/protocol increment, but this does not establish runtime, platform-integration, production, release, or Stable acceptance.
+    - Identity/pairing/session-credential interfaces now exist, but no production cryptographic device identity provider, secure pairing implementation, expiring/revocable session credential provider, encryption, authenticated network transport, or durable trust store exists.
+    - Source-level command ordering and idempotency exist, but complete replay protection across real transports, reconnect, recovery, and malicious peers is not established.
     - Manager, Privacy Shield, Wardveil Security, Everkeep, Mesh, and Identity runtime integrations remain unaccepted.
     - Glaze UI 1.5.0 is the current required Stable consumer target, but no Cast UI implementation or product-specific acceptance evidence exists.
     - No controller or receiver runtime, network transport, media playback, streaming, capture, grouping, guest, or remote Cast implementation exists.
