@@ -3,7 +3,7 @@ title: "GoreeCloud Cast — Feature Roadmap"
 product: "GoreeCloud Cast"
 document_type: "Repository Feature Roadmap"
 status: "Proposed / Planned"
-version: "v0.2"
+version: "v0.3"
 classification: "Internal"
 implementation_status: "Phase 0 Development started; roadmap is not product completion evidence"
 last_updated: "2026-09-16"
@@ -11,7 +11,7 @@ last_updated: "2026-09-16"
 
 # GoreeCloud Cast — Feature Roadmap
 
-This repository roadmap is materially synchronized with the authoritative Drive roadmap `GoreeCloud/Feature Roadmap/GoreeCloud Cast/goreecloud-cast.md` v0.2. Until this branch is reviewed and merged and roadmap authority is formally reconciled, the Drive record remains authoritative.
+This repository roadmap is materially synchronized with the GoreeCloud Drive roadmap under `GoreeCloud/Feature Roadmap/GoreeCloud Cast/goreecloud-cast.md`. The Drive record remains authoritative until this branch is reviewed and merged and roadmap authority is formally reconciled.
 
 ## Product direction
 
@@ -23,7 +23,9 @@ Preferred delivery order:
 
 ## Current implementation state
 
-Phase 0 has started on this branch with implementation version `0.1.0`. The initial executable boundary covers capability negotiation, minimal discovery advertisements, bounded State Capsules, fail-closed consumption of Identity/Privacy/Security decisions, session authority types, local-first transport selection, and handoff preflight.
+Phase 0 has started on draft PR #1 with implementation version `0.1.0`. The initial executable boundary covers capability negotiation, minimal discovery advertisements, bounded State Capsules, fail-closed consumption of Identity/Privacy/Security decisions, session authority types, local-first transport selection, and handoff preflight.
+
+Exact source revision `f165832a3e2e0be546415672a916f706e21890b8` passed GoreeCloud Cast Core CI run `35155854625`, including `cargo fmt --check` and `cargo test --all-targets`. This is Development source/test evidence for the bounded core only.
 
 Phase 0 is **not complete**. Production cryptography, network transport, persistent trust, receiver/controller processes, UI, platform adapters, runtime acceptance, deployment, release, and Stable qualification remain unimplemented or unverified.
 
@@ -48,3 +50,23 @@ Phase 0 is **not complete**. Production cryptography, network transport, persist
 ## Active next boundary
 
 Complete the remaining Phase 0 core foundation by adding cryptographic identity adapter interfaces, secure pairing/session credential interfaces, deterministic protocol serialization, authenticated discovery detail exchange, command ordering/idempotency primitives, and an in-memory controller/receiver handshake harness. None of those items should be represented as production networking until runtime evidence exists.
+
+## Verified Phase 0 progress — September 16, 2026
+
+Implemented on draft PR #1:
+
+- native Rust core package `goreecloud-cast-core` version `0.1.0`;
+- receiver-first Cast mode selection;
+- minimized unauthenticated discovery shape;
+- bounded State Capsule with Restricted entries excluded from transfer;
+- explicit session state and state authority types;
+- fail-closed Identity, Privacy Shield, and Wardveil Security gate consumption;
+- local-first transport policy and selection;
+- unified handoff preflight and normalized failures;
+- executable core contract tests;
+- mandatory repository documentation baseline; and
+- Contract 0.2 platform declaration with incomplete integrations explicitly blocked or migration-required.
+
+The initial CI attempt stopped on rustfmt drift before compilation; the exact formatting changes reported by CI were applied. The subsequent exact-source run `35155854625` passed formatting and all current tests at revision `f165832a3e2e0be546415672a916f706e21890b8`.
+
+No production license grant is inferred from public repository visibility; package publication is disabled and the repository rights notice does not grant reuse rights absent separate GoreeCloud terms.
