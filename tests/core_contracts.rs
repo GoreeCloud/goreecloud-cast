@@ -1,7 +1,7 @@
 use goreecloud_cast_core::{
     capability::{Capability, CapabilitySet, CastMode},
     discovery::{DeviceCategory, DiscoveryAdvertisement},
-    handoff::{preflight, GateDecision, HandoffFailure, HandoffRequest, PlatformDecisions},
+    handoff::{GateDecision, HandoffFailure, HandoffRequest, PlatformDecisions, preflight},
     identity::{ActorContext, DeviceId, TrustLevel},
     state_capsule::{PlatformPrivacyDecision, PrivacyClass, StateCapsule, StateEntry},
     transport::{PathAvailability, TransportPolicy, TransportProfile},
