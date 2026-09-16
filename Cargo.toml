@@ -1,6 +1,6 @@
 [package]
 name = "goreecloud-cast-core"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2024"
 rust-version = "1.85"
 description = "Development core contracts for GoreeCloud Cast"
@@ -11,3 +11,4 @@ name = "goreecloud_cast_core"
 path = "src/lib.rs"
 
 [dependencies]
+ed25519-dalek = "=3.0.0"
