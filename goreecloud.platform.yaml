@@ -108,7 +108,14 @@ compatibility:
     - cast-handoff-preflight-development
 
 evidence:
-  acceptance_tests: []
+  acceptance_tests:
+    - id: cast-core-contracts-20260916
+      category: core
+      path: tests/core_contracts.rs
+      revision: f165832a3e2e0be546415672a916f706e21890b8
+      result: passed
+      observed_at: '2026-09-16T22:05:17Z'
+      notes: GoreeCloud Cast Core CI run 35155854625 passed cargo fmt --check and cargo test --all-targets for the bounded Phase 0 core on the exact source revision.
   release: []
 
 conformance:
@@ -124,7 +131,7 @@ conformance:
     - src/state_capsule.rs
     - tests/core_contracts.rs
   blockers:
-    - Phase 0 source has not yet produced passing exact-revision CI evidence.
+    - Exact-source Development CI passes for the bounded Phase 0 core, but this does not establish runtime, platform-integration, production, release, or Stable acceptance.
     - No cryptographic device identity, secure pairing, session credential derivation, encryption, replay protection, or durable trust store exists.
     - Manager, Privacy Shield, Wardveil Security, Everkeep, Mesh, and Identity runtime integrations remain unaccepted.
     - Glaze UI 1.5.0 is the current required Stable consumer target, but no Cast UI implementation or product-specific acceptance evidence exists.
