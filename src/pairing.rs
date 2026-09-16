@@ -60,11 +60,7 @@ impl PairingConfirmation {
         self.grant.as_ref()
     }
 
-    pub fn confirm(
-        &mut self,
-        now_ms: u64,
-        grant: PairingGrant,
-    ) -> Result<(), PairingFlowError> {
+    pub fn confirm(&mut self, now_ms: u64, grant: PairingGrant) -> Result<(), PairingFlowError> {
         self.ensure_pending(now_ms)?;
         if grant.controller != self.request.controller || grant.receiver != self.request.receiver {
             return Err(PairingFlowError::GrantBindingMismatch);

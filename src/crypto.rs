@@ -74,8 +74,8 @@ impl Ed25519DeviceVerifier {
         device_id: DeviceId,
         verifying_key: [u8; 32],
     ) -> Result<(), AdapterError> {
-        let verifying_key =
-            VerifyingKey::from_bytes(&verifying_key).map_err(|_| AdapterError::InvalidIdentityProof)?;
+        let verifying_key = VerifyingKey::from_bytes(&verifying_key)
+            .map_err(|_| AdapterError::InvalidIdentityProof)?;
         if verifying_key.is_weak() {
             return Err(AdapterError::InvalidIdentityProof);
         }
@@ -120,7 +120,11 @@ impl DeviceIdentityVerifier for Ed25519DeviceVerifier {
 
 fn challenge_message(device_id: &DeviceId, challenge: &AuthenticationChallenge) -> Vec<u8> {
     let mut message = Vec::with_capacity(
-        IDENTITY_DOMAIN.len() + device_id.as_str().len() + challenge.context.len() + challenge.nonce.len() + 8,
+        IDENTITY_DOMAIN.len()
+            + device_id.as_str().len()
+            + challenge.context.len()
+            + challenge.nonce.len()
+            + 8,
     );
     message.extend_from_slice(IDENTITY_DOMAIN);
     append_bounded(&mut message, device_id.as_str().as_bytes());

@@ -67,11 +67,7 @@ impl InMemoryCredentialLeaseStore {
         Ok(())
     }
 
-    pub fn validate(
-        &self,
-        presented: &SessionCredential,
-        now_ms: u64,
-    ) -> CredentialLeaseStatus {
+    pub fn validate(&self, presented: &SessionCredential, now_ms: u64) -> CredentialLeaseStatus {
         let Some(lease) = self.leases.get(&presented.handle) else {
             return CredentialLeaseStatus::Unknown;
         };

@@ -3,9 +3,7 @@ use goreecloud_cast_core::{
         AuthenticationChallenge, DeviceIdentitySigner, DeviceIdentityVerifier, PairingGrant,
         PairingRequest, SessionCredential, SessionCredentialBinding,
     },
-    credentials::{
-        CredentialLease, CredentialLeaseStatus, InMemoryCredentialLeaseStore,
-    },
+    credentials::{CredentialLease, CredentialLeaseStatus, InMemoryCredentialLeaseStore},
     crypto::{Ed25519DeviceSigner, Ed25519DeviceVerifier},
     identity::{DeviceId, TrustLevel},
     pairing::{PairingConfirmation, PairingFlowError, PairingState},
@@ -53,7 +51,10 @@ fn pairing_confirmation_expires_and_cannot_be_resurrected() {
         receiver: receiver(),
     };
     let mut confirmation = PairingConfirmation::new(request.clone(), 1_000, 2_000).unwrap();
-    assert_eq!(confirmation.state(1_500), PairingState::AwaitingConfirmation);
+    assert_eq!(
+        confirmation.state(1_500),
+        PairingState::AwaitingConfirmation
+    );
     assert_eq!(confirmation.state(2_000), PairingState::Expired);
 
     let grant = PairingGrant::new(
@@ -94,29 +95,30 @@ fn pairing_confirmation_rejects_mismatched_grants() {
 
 #[test]
 fn credential_leases_expire_revoke_and_reject_binding_substitution() {
-    let binding = SessionCredentialBinding::new(
-        "session:000000000001",
-        controller(),
-        receiver(),
-    )
-    .unwrap();
+    let binding =
+        SessionCredentialBinding::new("session:000000000001", controller(), receiver()).unwrap();
     let credential = SessionCredential::new("credential-handle-0001", binding.clone()).unwrap();
     let lease = CredentialLease::new(credential.clone(), 100, 200).unwrap();
     let mut store = InMemoryCredentialLeaseStore::new();
     store.register(lease).unwrap();
 
-    assert_eq!(store.validate(&credential, 150), CredentialLeaseStatus::Valid);
-    assert_eq!(store.validate(&credential, 200), CredentialLeaseStatus::Expired);
+    assert_eq!(
+        store.validate(&credential, 150),
+        CredentialLeaseStatus::Valid
+    );
+    assert_eq!(
+        store.validate(&credential, 200),
+        CredentialLeaseStatus::Expired
+    );
 
     store.revoke(&credential.handle, 175).unwrap();
-    assert_eq!(store.validate(&credential, 176), CredentialLeaseStatus::Revoked);
+    assert_eq!(
+        store.validate(&credential, 176),
+        CredentialLeaseStatus::Revoked
+    );
 
-    let substituted_binding = SessionCredentialBinding::new(
-        "session:000000000002",
-        controller(),
-        receiver(),
-    )
-    .unwrap();
+    let substituted_binding =
+        SessionCredentialBinding::new("session:000000000002", controller(), receiver()).unwrap();
     let substituted =
         SessionCredential::new(credential.handle.clone(), substituted_binding).unwrap();
     assert_eq!(
