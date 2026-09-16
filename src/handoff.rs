@@ -2,7 +2,7 @@ use crate::{
     capability::{CapabilitySet, CastMode},
     identity::{ActorContext, TrustLevel},
     state_capsule::{PlatformPrivacyDecision, StateCapsule},
-    transport::{select_transport, PathAvailability, TransportPolicy, TransportProfile},
+    transport::{PathAvailability, TransportPolicy, TransportProfile, select_transport},
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
